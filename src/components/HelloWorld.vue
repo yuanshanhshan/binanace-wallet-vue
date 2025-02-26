@@ -41,7 +41,7 @@ export default {
         //3. get Signature
         const signature = await core.ethSign(this.client, this.account, nonce)
         console.log('signature', signature)
-        //4. 签名发送发送到后端
+        //4. signature send to server
 
         return
       }

@@ -43,7 +43,7 @@ class Client {
   }
   async ethSign (client, wallet, nonce) {
     if (!client) {
-      console.log("请先连接钱包");
+      console.log("Please connect first");
       return
     }
     const message =
