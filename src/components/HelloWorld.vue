@@ -18,20 +18,33 @@ export default {
   data() {
     return {
       client: null,
+      chainId: null,
+      account: null,
     }
   },
   methods: {
     async connectWallet() {
-      if (!this.client) {
-        this.client = new Client()
+      const core = new Client()
+
+      const { client, chainId, accounts } = await core.connect()
+      console.log('client', client)
+      console.log('chainId', chainId)
+      console.log('accounts', accounts)
+      this.client = client
+      this.chainId = chainId
+      this.account = 'binance_' + accounts[0]
+
+      if (client) {
+        const signature = await core.ethSign(this.client)
+        console.log('signature', signature)
+        return
       }
-      await this.client.connect()
+      alert('Please connect to wallet')
     },
     async ethSign() {
-      if (!this.client) {
-        this.client = new Client()
-      }
-      await this.client.ethSign()
+      const core = new Client()
+
+      await core.ethSign(this.client)
     },
   },
 }

@@ -4,28 +4,27 @@ import { Buffer } from 'buffer';
 window.Buffer = Buffer;
 
 class Client {
-  constructor() {
-    this.client = new Core();
-    this.accounts = [];
-    this.chainId = "0x0";
-    this.sign = "";
-  }
+
 
   async connect () {
+    const client = new Core();
+    let chainId = null;
+    let accounts = null;
     try {
-      const rs = await this.client.connect({ lng: "zh-CN" });
+      const rs = await client.connect({ lng: "zh-CN" });
       // this.client = client;
-      this.chainId = rs.chainId;
-      this.accounts = rs.accounts;
+      chainId = rs.chainId;
+      accounts = rs.accounts;
       this.updateUI();
     } catch (error) {
       console.log(
         "🚀 ~ file: core.js:19 ~ connect ~ error:",
         error.code,
         error.message,
-        this.client.pending
+        client.pending
       );
     }
+    return { client, chainId, accounts };
   }
 
   async disconnect (client) {
@@ -42,33 +41,33 @@ class Client {
         error.message)
     }
   }
-
-  updateUI () {
-    // 更新UI的逻辑，例如显示连接状态、账户信息等
-    const root = document.getElementById('root');
-    root.innerHTML = `
-      <div>
-        <p>Chain ID: ${this.chainId}</p>
-        <p>Accounts: ${this.accounts.join(', ')}</p>
-        <p>Sign: ${this.sign}</p>
-      </div>
-    `;
-  }
-
-  async ethSign () {
-    if (!this.client) {
+  async ethSign (client, wallet, nonce) {
+    if (!client) {
       console.log("请先连接钱包");
       return
     }
-
-    const msg = `0x${Buffer.from("hello", "utf8").toString("hex")}`;
+    const message =
+      'Welcome to Sleepless AI Lab!\n' +
+      'Click to sign-in and accept our agreements:\n' +
+      'Privacy Policy (https://img.sleeplessailab.com/PRIVACY%20POLICY.html)\n' +
+      'Terms & Conditions (https://img.sleeplessailab.com/TERMS%20AND%20CONDITIONS.html)\n' +
+      '\n' +
+      'This request will not trigger a blockchain transaction or cost any gas fees.\n' +
+      '\n' +
+      'Wallet address:' +
+      wallet +
+      '\n' +
+      '\n' +
+      'Nonce:' +
+      nonce;
+    const msg = `0x${Buffer.from(message, "utf8").toString("hex")}`;
 
     console.log(msg);
 
-    const rs = await this.client
+    const rs = await client
       .request({
         method: "personal_sign",
-        params: [msg, this.client.accounts[0]],
+        params: [msg, client.accounts[0]],
       })
       .catch((error) => {
         console.log(
@@ -77,9 +76,8 @@ class Client {
           error.message
         );
       });
-    this.sign = rs;
-    this.updateUI();
     console.log("🚀 ~~ file: client.tsx:45 ~~ personalSign ~~ rs:", rs);
+    return rs;
   }
 }
 
