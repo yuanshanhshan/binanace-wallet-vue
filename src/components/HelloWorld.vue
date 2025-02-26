@@ -25,7 +25,7 @@ export default {
   methods: {
     async connectWallet() {
       const core = new Client()
-
+      //1. connect binance wallet
       const { client, chainId, accounts } = await core.connect()
       console.log('client', client)
       console.log('chainId', chainId)
@@ -34,9 +34,15 @@ export default {
       this.chainId = chainId
       this.account = 'binance_' + accounts[0]
 
+      //2. get nonce
+      const nonce = 1
+
       if (client) {
-        const signature = await core.ethSign(this.client)
+        //3. get Signature
+        const signature = await core.ethSign(this.client, this.account, nonce)
         console.log('signature', signature)
+        //4. 签名发送发送到后端
+
         return
       }
       alert('Please connect to wallet')
